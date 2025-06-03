@@ -48,31 +48,6 @@ region_mapping = {
     "NEW ZEALAND": "ANZ"
 }
 
-def bagi_minggu(dates):
-    """Fungsi untuk membagi data berdasarkan minggu"""
-    minggu_list = []
-    dates = pd.Series(dates)
-    first_date = dates.iloc[0]
-    
-    # Dapatkan tanggal 1 dari bulan tersebut
-    first_day_of_month = first_date.replace(day=1)
-    
-    # Temukan hari Minggu pertama setelah tanggal 1
-    current_date = first_day_of_month
-    while current_date.weekday() != 6:  # 6 adalah hari Minggu
-        current_date += pd.Timedelta(days=1)
-    first_sunday = current_date.day
-    
-    for date in dates:
-        if date.day <= first_sunday:
-            minggu_list.append(1)
-        else:
-            days_after_first_sunday = date.day - first_sunday
-            week_number = 2 + (days_after_first_sunday - 1) // 7
-            minggu_list.append(week_number)
-    
-    return minggu_list
-
 def process_trends_data(excel_path, file_name=None):
     """Fungsi untuk memproses data trend dan menghasilkan ringkasan mingguan"""
     xls = pd.ExcelFile(excel_path)
@@ -96,27 +71,17 @@ def process_trends_data(excel_path, file_name=None):
                 print(f"Warning: Date parsing issue in sheet {sheet}. Please check the date format.")
                 continue
         
-        # Gunakan tanggal untuk pengelompokan minggu
-        df['minggu'] = bagi_minggu(df['Day'])
-        
-        # Dapatkan tanggal awal setiap minggu untuk kolom Week dan format ke date saja
-        week_dates = df.groupby('minggu')['Day'].first().dt.date
-        
-        # Hitung rata-rata per minggu
-        df_numerik = df.select_dtypes(include='number')
-        rata_rata_per_kelompok = df_numerik.groupby(df['minggu']).mean()
-        
-        # Tambahkan kolom informasi negara, region, dan minggu
+        # Tambahkan kolom informasi negara, region, dan hari
+        df['Day'] = df['Day'].dt.date  # Convert to date only
+
         nama_country = negara_dict.get(sheet, "Unknown")
         region = region_mapping.get(nama_country, "Unknown")  # Get region based on country name
-        rata_rata_per_kelompok['Country'] = nama_country
-        rata_rata_per_kelompok['Region'] = region
-        rata_rata_per_kelompok['Week'] = week_dates
-        rata_rata_per_kelompok['minggu'] = rata_rata_per_kelompok.index
+        df['Country'] = nama_country
+        df['Region'] = region
         
         # Konversi format DataFrame
-        data_tren = rata_rata_per_kelompok.melt(
-            id_vars=['Week', 'Country', 'Region', 'minggu'],  # Added 'Region' to id_vars
+        data_tren = df.melt(
+            id_vars=['Day', 'Country', 'Region'],  # Added 'Region' to id_vars
             var_name='Search term',
             value_name='Trend index'
         )
@@ -124,7 +89,6 @@ def process_trends_data(excel_path, file_name=None):
     
     # Gabungkan semua data
     hasil_akhir = pd.concat(data_tren_list, ignore_index=True)
-    hasil_akhir = hasil_akhir.drop(columns=['minggu']) 
     hasil_akhir['Trend index'] = hasil_akhir['Trend index'].round(0)
 
     # Memisahkan data berdasarkan Region
