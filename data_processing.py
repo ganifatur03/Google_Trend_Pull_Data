@@ -1,8 +1,7 @@
 import pandas as pd
 from datetime import datetime
 
-## File python yg ini, bisa langsung menarget Folder yang berisi file google trend. 
-## Tidak perlu mengganti nama file satu per satu selama saat mendownload berurutan
+## This file is used to process Google Trends data from an Excel file .
 
 # Dictionary untuk nama hari
 hari_dict = {
@@ -47,6 +46,18 @@ region_mapping = {
     "AUSTRALIA": "ANZ",
     "NEW ZEALAND": "ANZ"
 }
+
+sub_brand_mapping = {
+    "Yoga": [["LENOVO YOGA", "APPLE MACBOOK", "ASUS ZENBOOK", "DELL XPS", "HP ENVY"], 
+             ["LENOVO YOGA", "APPLE MACBOOK", "DELL INSPIRON", "ACER SWIFT", "HP SPECTRE"]],
+    "Ideapad": ["LENOVO IDEAPAD", "HP PAVILION", "ASUS VIVOBOOK", "ACER ASPIRE", "DELL INSPIRON"] ,
+    "LOQ": ["LENOVO LOQ", "ACER NITRO", "HP VICTUS", "MSI CYBORG", "ASUS TUF"],
+    "Legion": ["LENOVO LEGION", "ASUS ROG", "HP OMEN", "ACER PREDATOR", "MSI GAMING"],
+    "Tablet": [["LENOVO TAB", "LENOVO TABLET", "SAMSUNG GALAXY TAB", "XIAOMI PAD", "HUAWEI MATEPAD"], 
+               ["LENOVO TAB", "LENOVO TABLET", "SAMSUNG GALAXY TAB","REALME PAD", "APPLE IPAD"]],
+    "Brand": "LENOVO"
+}
+
 
 def process_trends_data(excel_path, file_name=None):
     """Fungsi untuk memproses data trend dan menghasilkan ringkasan mingguan"""
@@ -103,6 +114,7 @@ def process_trends_data(excel_path, file_name=None):
     else:
         output_summary = excel_path.split('.', 1)[0] + " - Processed.xlsx"
     with pd.ExcelWriter(output_summary, engine='openpyxl') as writer:
+        hasil_akhir.to_excel(writer, index=False)
         region_CAP.to_excel(writer, index=False, sheet_name='CAP9')
         region_JP.to_excel(writer, index=False, sheet_name='JP')
         region_IN.to_excel(writer, index=False, sheet_name='IN')
