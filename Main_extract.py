@@ -16,6 +16,39 @@ countries = {
     'MY': "Malaysia"
 }
 
+# Dictionary untuk negara
+negara_dict = {
+    'Indonesia': "INDONESIA",
+    'Malaysia': "MALAYSIA",
+    'Singapore': "SINGAPORE",
+    'Philippines': "PHILIPPINES",
+    'Vietnam': "VIETNAM",
+    'Thailand': "THAILAND",
+    'Taiwan': "TAIWAN",
+    'Hong Kong': "HONG KONG",
+    'South Korea': "SOUTH KOREA",
+    'Japan': "JAPAN",
+    'India': "INDIA",
+    'Australia': "AUSTRALIA",
+    'New Zealand': "NEW ZEALAND"
+}
+
+region_mapping = {
+    "INDONESIA": "CAP",
+    "MALAYSIA": "CAP",
+    "SINGAPORE": "CAP",
+    "PHILIPPINES": "CAP",
+    "VIETNAM": "CAP",
+    "THAILAND": "CAP",
+    "TAIWAN": "CAP",
+    "HONG KONG": "CAP",
+    "SOUTH KOREA": "CAP",
+    "JAPAN": "JP",
+    "INDIA": "IN",
+    "AUSTRALIA": "ANZ",
+    "NEW ZEALAND": "ANZ"
+}
+
 # Keyword used, this is for testing purpose
 keywords_group1 = [
     "LENOVO LEGION",
@@ -47,7 +80,7 @@ date_to = "2025-05-31"
 
 def extract_google_trends_data(keywords_group=keywords_group1):
     # Set empty dictionary to store all data
-    all_data = {}
+    all_data = []
 
     # Fetching data using Custom Google Trends API
     for code, country in countries.items():
@@ -79,7 +112,18 @@ def extract_google_trends_data(keywords_group=keywords_group1):
                     rows.append(row)
 
                 df = pd.DataFrame(rows)
-                all_data[country] = df
+                nama_country = negara_dict.get(country, "Unknown")
+                region = region_mapping.get(nama_country, "Unknown")  # Get region based on country name
+                df['Country'] = nama_country
+                df['Region'] = region
+
+                # Konversi format DataFrame
+                data_tren = df.melt(
+                    id_vars=['Day', 'Country', 'Region'],  # Added 'Region' to id_vars
+                    var_name='Search term',
+                    value_name='Trend index'
+                )
+                all_data.append(data_tren)
                 print(f"✅ Data extracted successfully for {country}")
             except Exception as e:
                 print(f"⚠️ Fail to extract data for {country}: {e}")
