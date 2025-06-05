@@ -16,17 +16,17 @@ client = RestClient(Login_email, Login_password)
 countries = {
     'ID': "Indonesia",
     'MY': "Malaysia",
-    'Singapore': "SINGAPORE",
-    'Philippines': "PHILIPPINES",
-    'Vietnam': "VIETNAM",
-    'Thailand': "THAILAND",
-    'Taiwan': "TAIWAN",
-    'Hong Kong': "HONG KONG",
-    'South Korea': "SOUTH KOREA",
-    'Japan': "JAPAN",
-    'India': "INDIA",
-    'Australia': "AUSTRALIA",
-    'New Zealand': "NEW ZEALAND"
+    'SG': "Singapore",
+    'PH': "Philippines",
+    'VN': "Vietnam",
+    'TH': "Thailand",
+    'TW': "Taiwan",
+    'HK': "Hong Kong",
+    'KR': "South Korea",
+    'JP': "Japan",
+    'IN': "India",
+    'AU': "Australia",
+    'NZ': "New Zealand"
 }
 
 # Keyword yang digunakan
@@ -42,17 +42,18 @@ keywords = [
 sub_brand_mapping = {
     "yoga1"  : ["LENOVO YOGA", "APPLE MACBOOK", "ASUS ZENBOOK", "DELL XPS", "HP ENVY"], 
     "yoga2"  :["LENOVO YOGA", "APPLE MACBOOK", "DELL INSPIRON", "ACER SWIFT", "HP SPECTRE"],
+    "yoga3"  :["LENOVO YOGA", "APPLE MACBOOK", "ASUS ZENBOOK", "NEC LAVIE", "HP ENVY"],  #Only for Japan
     "ideapad": ["LENOVO IDEAPAD", "HP PAVILION", "ASUS VIVOBOOK", "ACER ASPIRE", "DELL INSPIRON"] ,
     "loq"   : ["LENOVO LOQ", "ACER NITRO", "HP VICTUS", "MSI CYBORG", "ASUS TUF"],
     "legion": ["LENOVO LEGION", "ASUS ROG", "HP OMEN", "ACER PREDATOR", "MSI GAMING"],
     "tablet1": ["LENOVO TAB", "LENOVO TABLET", "SAMSUNG GALAXY TAB", "XIAOMI PAD", "HUAWEI MATEPAD"], 
     "tablet2": ["LENOVO TAB", "LENOVO TABLET", "SAMSUNG GALAXY TAB","REALME PAD", "APPLE IPAD"],
-    "brand" : "LENOVO"
+    "brand" : ["LENOVO"]
 }
 
 # Range tanggal
 date_from = "2022-01-01"
-date_to = "2025-05-31"
+date_to = "2025-04-30"
 
 # Dictionary untuk simpan data per negara
 all_data = {}

@@ -1,0 +1,29 @@
+## List negara ##
+countries = {
+    'ID': "Indonesia",
+    'MY': "Malaysia",
+    'SG': "Singapore",
+    'PH': "Philippines",
+    'VN': "Vietnam",
+    'TH': "Thailand",
+    'TW': "Taiwan",
+    'HK': "Hong Kong",
+    'KR': "South Korea",
+    'JP': "Japan",
+    'IN': "India",
+    'AU': "Australia",
+    'NZ': "New Zealand"
+}
+
+## List subbrand ##
+sub_brand_mapping = {
+    "yoga1"  : ["LENOVO YOGA", "APPLE MACBOOK", "ASUS ZENBOOK", "DELL XPS", "HP ENVY"], 
+    "yoga2"  :["LENOVO YOGA", "APPLE MACBOOK", "DELL INSPIRON", "ACER SWIFT", "HP SPECTRE"],
+    "yoga3"  :["LENOVO YOGA", "APPLE MACBOOK", "ASUS ZENBOOK", "NEC LAVIE", "HP ENVY"],  #Only for Japan
+    "ideapad": ["LENOVO IDEAPAD", "HP PAVILION", "ASUS VIVOBOOK", "ACER ASPIRE", "DELL INSPIRON"] ,
+    "loq"   : ["LENOVO LOQ", "ACER NITRO", "HP VICTUS", "MSI CYBORG", "ASUS TUF"],
+    "legion": ["LENOVO LEGION", "ASUS ROG", "HP OMEN", "ACER PREDATOR", "MSI GAMING"],
+    "tablet1": ["LENOVO TAB", "LENOVO TABLET", "SAMSUNG GALAXY TAB", "XIAOMI PAD", "HUAWEI MATEPAD"], 
+    "tablet2": ["LENOVO TAB", "LENOVO TABLET", "SAMSUNG GALAXY TAB","REALME PAD", "APPLE IPAD"],
+    "brand" : ["LENOVO"]
+}

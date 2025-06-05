@@ -99,15 +99,15 @@ def process_trends_data(excel_path, file_name=None):
     
     # Simpan hasil ke file Excel baru
     if file_name:
-        output_summary = excel_path.split('Raw', 1)[0] + "Processed file/" + file_name + " - Processed.xlsx"
+        output_summary = excel_path.split('Raw', 1)[0] + "Processed file/" + file_name.split('.xlsx', 1)[0] + " - Processed.xlsx"
     else:
         output_summary = excel_path.split('.', 1)[0] + " - Processed.xlsx"
     with pd.ExcelWriter(output_summary, engine='openpyxl') as writer:
-        hasil_akhir.to_excel(writer, index=False)
-        """region_CAP.to_excel(writer, index=False, sheet_name='CAP9')
+        hasil_akhir.to_excel(writer, index=False, sheet_name='Complete')
+        region_CAP.to_excel(writer, index=False, sheet_name='CAP9')
         region_JP.to_excel(writer, index=False, sheet_name='JP')
         region_IN.to_excel(writer, index=False, sheet_name='IN')
-        region_ANZ.to_excel(writer, index=False, sheet_name='ANZ')"""
+        region_ANZ.to_excel(writer, index=False, sheet_name='ANZ')
     print(f"\nRingkasan trend telah disimpan ke '{output_summary}'")
     
     return hasil_akhir
