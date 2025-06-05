@@ -99,7 +99,7 @@ def process_trends_data(excel_path, file_name=None):
     
     # Simpan hasil ke file Excel baru
     if file_name:
-        output_summary = excel_path.split('Raw', 1)[0] + "Processed file/" + file_name.split('.xlsx', 1)[0] + " - Processed.xlsx"
+        output_summary = excel_path.split('Raw', 1)[0] + "Processed_file/" + file_name.split('.xlsx', 1)[0] + " - Processed.xlsx"
     else:
         output_summary = excel_path.split('.', 1)[0] + " - Processed.xlsx"
     with pd.ExcelWriter(output_summary, engine='openpyxl') as writer:

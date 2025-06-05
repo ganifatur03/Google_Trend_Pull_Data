@@ -41,7 +41,7 @@ keywords = [
 # Dictionary of Keywords group for each brand
 sub_brand_mapping = {
     "yoga1"  : ["LENOVO YOGA", "APPLE MACBOOK", "ASUS ZENBOOK", "DELL XPS", "HP ENVY"], 
-    "yoga2"  :["LENOVO YOGA", "APPLE MACBOOK", "DELL INSPIRON", "ACER SWIFT", "HP SPECTRE"],
+    "yoga2"  :["LENOVO YOGA", "APPLE MACBOOK", "DELL INSPIRON 7000", "ACER SWIFT", "HP SPECTRE"],
     "yoga3"  :["LENOVO YOGA", "APPLE MACBOOK", "ASUS ZENBOOK", "NEC LAVIE", "HP ENVY"],  #Only for Japan
     "ideapad": ["LENOVO IDEAPAD", "HP PAVILION", "ASUS VIVOBOOK", "ACER ASPIRE", "DELL INSPIRON"] ,
     "loq"   : ["LENOVO LOQ", "ACER NITRO", "HP VICTUS", "MSI CYBORG", "ASUS TUF"],
@@ -53,7 +53,7 @@ sub_brand_mapping = {
 
 # Range tanggal
 date_from = "2022-01-01"
-date_to = "2025-04-30"
+date_to = "2025-05-31"
 
 # Dictionary untuk simpan data per negara
 all_data = {}
@@ -67,8 +67,8 @@ def extract_google_trends_data(keywords_group):
                 "date_from": date_from,
                 "date_to": date_to,
                 "type": "web",
-                "keywords": keywords_group,
-                "category_name": "Computers & Electronics"
+                "keywords": keywords_group
+                ## "category_name": "Computers & Electronics"
             }
         }
 
@@ -117,7 +117,7 @@ if not Google_trend_name.endswith('.xlsx'):
 
 
 all_data = select_subbrand(brand_name)
-output_path = "D:/Python/Lenovo Google Trend/Raw file/"  + Google_trend_name
+output_path = "D:/Python/Lenovo Google Trend/Raw_file/"  + Google_trend_name
 with pd.ExcelWriter(output_path) as writer:
     for country, df in all_data.items():
         # Nama sheet maksimal 31 karakter, amanin
