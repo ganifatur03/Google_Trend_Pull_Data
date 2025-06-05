@@ -103,10 +103,11 @@ def process_trends_data(excel_path, file_name=None):
     else:
         output_summary = excel_path.split('.', 1)[0] + " - Processed.xlsx"
     with pd.ExcelWriter(output_summary, engine='openpyxl') as writer:
-        region_CAP.to_excel(writer, index=False, sheet_name='CAP9')
+        hasil_akhir.to_excel(writer, index=False)
+        """region_CAP.to_excel(writer, index=False, sheet_name='CAP9')
         region_JP.to_excel(writer, index=False, sheet_name='JP')
         region_IN.to_excel(writer, index=False, sheet_name='IN')
-        region_ANZ.to_excel(writer, index=False, sheet_name='ANZ')
+        region_ANZ.to_excel(writer, index=False, sheet_name='ANZ')"""
     print(f"\nRingkasan trend telah disimpan ke '{output_summary}'")
     
     return hasil_akhir
