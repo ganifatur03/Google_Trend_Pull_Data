@@ -13,7 +13,7 @@ client = RestClient(Login_email, Login_password)
 
 # Countries list
 countries = {
-    'ID': "Indonesia",
+    'JP': "Japan",
     'WORLD': None       # ommit location countries to get worldwide data
 }
 
@@ -129,6 +129,7 @@ def extract_google_trends_data(keywords_group, countries_subset=None):
     
     # Combine all trend data into a single DataFrame
     final_result = pd.concat(data_trend_list, ignore_index=True)
+    final_result.rename(columns={"Day": "Week"}, inplace=True)
     return final_result
 
 def select_subbrand(subbrand):
@@ -147,7 +148,7 @@ def select_subbrand(subbrand):
             extract_parts.append(extract)
 
         # Special handling: additional keywords for Yoga only in Japan
-        if subbrand == "Yoga":
+        if subbrand == "yoga":
             yoga_jp = ["LENOVO YOGA", "APPLE MACBOOK", "ASUS ZENBOOK", "NEC LAVIE", "HP ENVY"]
             japan_only = {"JP": "Japan"}
             print("🌏 Extracting Yoga-specific keywords for Japan (yoga_jp)...")
