@@ -112,7 +112,7 @@ def process_trends_data(excel_path, file_name=None):
     region_ANZ = hasil_akhir[hasil_akhir['Region'] == 'ANZ']
     
     # Simpan hasil ke file Excel baru
-    if file_name:
+    """if file_name:
         output_summary = excel_path.split('Raw', 1)[0] + "Processed_file/" + file_name.split('.xlsx', 1)[0] + " - Processed.xlsx"
     else:
         output_summary = excel_path.split('.', 1)[0] + " - Processed.xlsx"
@@ -123,7 +123,7 @@ def process_trends_data(excel_path, file_name=None):
         region_JP.to_excel(writer, index=False, sheet_name='JP')
         region_IN.to_excel(writer, index=False, sheet_name='IN')
         region_ANZ.to_excel(writer, index=False, sheet_name='ANZ')
-    print(f"\nRingkasan trend telah disimpan ke '{output_summary}'")
+    print(f"\nRingkasan trend telah disimpan ke '{output_summary}'")"""
     
     return hasil_akhir
 
