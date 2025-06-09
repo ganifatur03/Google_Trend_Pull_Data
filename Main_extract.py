@@ -26,7 +26,8 @@ countries = {
     'JP': "Japan",
     'IN': "India",
     'AU': "Australia",
-    'NZ': "New Zealand"
+    'NZ': "New Zealand",
+    'WORLD': None       # ommit location countries to get worldwide data
 }
 
 # Keyword yang digunakan
@@ -68,7 +69,7 @@ def extract_google_trends_data(keywords_group):
                 "date_to": date_to,
                 "type": "web",
                 "keywords": keywords_group
-                ## "category_name": "Computers & Electronics"
+                # "category_name": "Computers & Electronics"
             }
         }
 
@@ -89,7 +90,7 @@ def extract_google_trends_data(keywords_group):
                     rows.append(row)
 
                 df = pd.DataFrame(rows)
-                all_data[country] = df
+                all_data[country if country else 'Worldwide'] = df
                 print(f"✅ Data sukses diambil untuk {country}")
             except Exception as e:
                 print(f"⚠️ Gagal memproses data untuk {country}: {e}")

@@ -12,7 +12,8 @@ countries = {
     'JP': "Japan",
     'IN': "India",
     'AU': "Australia",
-    'NZ': "New Zealand"
+    'NZ': "New Zealand",
+    'WORLD': None
 }
 
 ## List subbrand ##
