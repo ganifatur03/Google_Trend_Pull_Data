@@ -28,7 +28,8 @@ negara_dict = {
     'Japan': "JAPAN",
     'India': "INDIA",
     'Australia': "AUSTRALIA",
-    'New Zealand': "NEW ZEALAND"
+    'New Zealand': "NEW ZEALAND",
+    'Worldwide': "WORLDWIDE"
 }
 
 region_mapping = {
@@ -44,7 +45,8 @@ region_mapping = {
     "JAPAN": "JP",
     "INDIA": "IN",
     "AUSTRALIA": "ANZ",
-    "NEW ZEALAND": "ANZ"
+    "NEW ZEALAND": "ANZ",
+    "WORLDWIDE": "WORLD"
 }
 
 sub_brand_mapping = {
@@ -103,6 +105,7 @@ def process_trends_data(excel_path, file_name=None):
     hasil_akhir['Trend index'] = hasil_akhir['Trend index'].round(0)
 
     # Memisahkan data berdasarkan Region
+    region_WORLD = hasil_akhir[hasil_akhir['Region'] == 'WORLD']
     region_CAP = hasil_akhir[hasil_akhir['Region'] == 'CAP']
     region_JP = hasil_akhir[hasil_akhir['Region'] == 'JP']  
     region_IN = hasil_akhir[hasil_akhir['Region'] == 'IN']
@@ -110,11 +113,12 @@ def process_trends_data(excel_path, file_name=None):
     
     # Simpan hasil ke file Excel baru
     if file_name:
-        output_summary = excel_path.split('Raw', 1)[0] + "Processed file/" + file_name + " - Processed.xlsx"
+        output_summary = excel_path.split('Raw', 1)[0] + "Processed_file/" + file_name.split('.xlsx', 1)[0] + " - Processed.xlsx"
     else:
         output_summary = excel_path.split('.', 1)[0] + " - Processed.xlsx"
     with pd.ExcelWriter(output_summary, engine='openpyxl') as writer:
-        hasil_akhir.to_excel(writer, index=False)
+        hasil_akhir.to_excel(writer, index=False, sheet_name='Complete')
+        region_WORLD.to_excel(writer, index=False, sheet_name='WORLD')
         region_CAP.to_excel(writer, index=False, sheet_name='CAP9')
         region_JP.to_excel(writer, index=False, sheet_name='JP')
         region_IN.to_excel(writer, index=False, sheet_name='IN')

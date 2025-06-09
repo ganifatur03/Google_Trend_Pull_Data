@@ -2,10 +2,12 @@ from client import RestClient
 from datetime import datetime
 import data_processing
 import pandas as pd
+from dotenv import load_dotenv
+import os
 
-# Credential for API
-Login_email = "gani@team.superfk.co"
-Login_password = "f881f3d369097a8a"
+load_dotenv()
+Login_email = os.getenv("LOGIN_EMAIL")
+Login_password = os.getenv("LOGIN_PASSWORD")
 
 # Initialize client
 client = RestClient(Login_email, Login_password)
@@ -13,40 +15,19 @@ client = RestClient(Login_email, Login_password)
 # Countries list
 countries = {
     'ID': "Indonesia",
-    'MY': "Malaysia"
-}
-
-# Dictionary untuk negara
-negara_dict = {
-    'Indonesia': "INDONESIA",
-    'Malaysia': "MALAYSIA",
-    'Singapore': "SINGAPORE",
-    'Philippines': "PHILIPPINES",
-    'Vietnam': "VIETNAM",
-    'Thailand': "THAILAND",
-    'Taiwan': "TAIWAN",
-    'Hong Kong': "HONG KONG",
-    'South Korea': "SOUTH KOREA",
-    'Japan': "JAPAN",
-    'India': "INDIA",
-    'Australia': "AUSTRALIA",
-    'New Zealand': "NEW ZEALAND"
-}
-
-region_mapping = {
-    "INDONESIA": "CAP",
-    "MALAYSIA": "CAP",
-    "SINGAPORE": "CAP",
-    "PHILIPPINES": "CAP",
-    "VIETNAM": "CAP",
-    "THAILAND": "CAP",
-    "TAIWAN": "CAP",
-    "HONG KONG": "CAP",
-    "SOUTH KOREA": "CAP",
-    "JAPAN": "JP",
-    "INDIA": "IN",
-    "AUSTRALIA": "ANZ",
-    "NEW ZEALAND": "ANZ"
+    'MY': "Malaysia",
+    'SG': "Singapore",
+    'PH': "Philippines",
+    'VN': "Vietnam",
+    'TH': "Thailand",
+    'TW': "Taiwan",
+    'HK': "Hong Kong",
+    'KR': "South Korea",
+    'JP': "Japan",
+    'IN': "India",
+    'AU': "Australia",
+    'NZ': "New Zealand",
+    'WORLD': None       # ommit location countries to get worldwide data
 }
 
 # Keyword used, this is for testing purpose
@@ -60,29 +41,26 @@ keywords_group1 = [
 
 # Dictionary of Keywords group for each brand
 sub_brand_mapping = {
-    "yoga"  : [
-        ["LENOVO YOGA", "APPLE MACBOOK", "ASUS ZENBOOK", "DELL XPS", "HP ENVY"], 
-        ["LENOVO YOGA", "APPLE MACBOOK", "DELL INSPIRON", "ACER SWIFT", "HP SPECTRE"]
-    ],
+    "yoga1"  : ["LENOVO YOGA", "APPLE MACBOOK", "ASUS ZENBOOK", "DELL XPS", "HP ENVY"], 
+    "yoga2"  :["LENOVO YOGA", "APPLE MACBOOK", "DELL INSPIRON 7000", "ACER SWIFT", "HP SPECTRE"],
+    "yoga3"  :["LENOVO YOGA", "APPLE MACBOOK", "ASUS ZENBOOK", "NEC LAVIE", "HP ENVY"],  #Only for Japan
     "ideapad": ["LENOVO IDEAPAD", "HP PAVILION", "ASUS VIVOBOOK", "ACER ASPIRE", "DELL INSPIRON"] ,
     "loq"   : ["LENOVO LOQ", "ACER NITRO", "HP VICTUS", "MSI CYBORG", "ASUS TUF"],
     "legion": ["LENOVO LEGION", "ASUS ROG", "HP OMEN", "ACER PREDATOR", "MSI GAMING"],
-    "tablet": [
-        ["LENOVO TAB", "LENOVO TABLET", "SAMSUNG GALAXY TAB", "XIAOMI PAD", "HUAWEI MATEPAD"], 
-        ["LENOVO TAB", "LENOVO TABLET", "SAMSUNG GALAXY TAB","REALME PAD", "APPLE IPAD"]
-    ],
-    "brand" : "LENOVO"
+    "tablet1": ["LENOVO TAB", "LENOVO TABLET", "SAMSUNG GALAXY TAB", "XIAOMI PAD", "HUAWEI MATEPAD"], 
+    "tablet2": ["LENOVO TAB", "LENOVO TABLET", "SAMSUNG GALAXY TAB","REALME PAD", "APPLE IPAD"],
+    "brand" : ["LENOVO"]
 }
 
-# Set default date range
+# Range tanggal
 date_from = "2022-01-01"
 date_to = "2025-05-31"
 
-def extract_google_trends_data(keywords_group=keywords_group1):
-    # Set empty dictionary to store all data
-    all_data = []
+# Dictionary untuk simpan data per negara
+all_data = {}
 
-    # Fetching data using Custom Google Trends API
+# Loop untuk setiap negara
+def extract_google_trends_data(keywords_group):
     for code, country in countries.items():
         post_data = {
             0: {
@@ -90,8 +68,8 @@ def extract_google_trends_data(keywords_group=keywords_group1):
                 "date_from": date_from,
                 "date_to": date_to,
                 "type": "web",
-                "keywords": keywords_group,
-                "category_name": "Computers & Electronics"
+                "keywords": keywords_group
+                # "category_name": "Computers & Electronics"
             }
         }
 
@@ -112,78 +90,45 @@ def extract_google_trends_data(keywords_group=keywords_group1):
                     rows.append(row)
 
                 df = pd.DataFrame(rows)
-                nama_country = negara_dict.get(country, "Unknown")
-                region = region_mapping.get(nama_country, "Unknown")  # Get region based on country name
-                df['Country'] = nama_country
-                df['Region'] = region
-
-                # Konversi format DataFrame
-                data_tren = df.melt(
-                    id_vars=['Day', 'Country', 'Region'],  # Added 'Region' to id_vars
-                    var_name='Search term',
-                    value_name='Trend index'
-                )
-                all_data.append(data_tren)
-                print(f"✅ Data extracted successfully for {country}")
+                all_data[country if country else 'Worldwide'] = df
+                print(f"✅ Data sukses diambil untuk {country}")
             except Exception as e:
-                print(f"⚠️ Fail to extract data for {country}: {e}")
+                print(f"⚠️ Gagal memproses data untuk {country}: {e}")
         else:
-            print(f"❌ Error for {country}: {response['status_message']}")
+            print(f"❌ Error untuk {country}: {response['status_message']}")
     return all_data
 
 def select_subbrand(subbrand):
     ## This function processes data for a specific sub-brand
-
     # Check which subbrand is being extracted
+
     if subbrand not in sub_brand_mapping:
         raise ValueError(f"Sub-brand '{subbrand}' is not available. Please choice from thise list: {list(sub_brand_mapping.keys())}.")
-    
-    if subbrand not in ["yoga", "tablet"]:
+    else:
         subbrand_keywords = sub_brand_mapping[subbrand]
         extracted_data = extract_google_trends_data(subbrand_keywords)
-    else:
-        subbrand_keywords_1 = sub_brand_mapping[subbrand][0]
-        data_1 = extract_google_trends_data(subbrand_keywords_1)
-
-        subbrand_keywords_2 = sub_brand_mapping[subbrand][1]
-        data_2 = extract_google_trends_data(subbrand_keywords_2)
-
-        # Removing duplicates and merging data
-        extracted_data = {**data_1, **data_2}
-        for country, df in extracted_data.items():
-            df["country_name"] = country
-
-        # Join and remove duplicates
-        combined_df = pd.concat(extracted_data.values(), ignore_index=True)
-        cleaned_df = combined_df.drop_duplicates(keep='first')
-
-        # Return it back as a dictionary with country names as keys
-        result_dict = {
-            country: df.reset_index(drop=True)
-            for country, df in cleaned_df.groupby("country_name")
-        }
     return extracted_data
 
-# Begin extraction
-print("=== Google Trends Data Extractor ===")
+# Simpan semua sheet ke satu file Excel
+print("=== Memulai Mengekstrak Data Google Trends ===")
 brand_name = input("\nSelect which Lenovo sub brand you want to extract (example: 'legion', 'ideapad', etc): ").lower()
-google_trend_name = input("Select file name you want to save as (example: 'google_trends_result.xlsx'): ")
-if not google_trend_name.endswith('.xlsx'):
-        google_trend_name = google_trend_name + '.xlsx'
+Google_trend_name = input("Masukkan nama file Google Trends (misal: 'hasil_google_trends.xlsx'): ")
+if not Google_trend_name.endswith('.xlsx'):
+        Google_trend_name = Google_trend_name + '.xlsx'
 
-print("\n=== Start Extracting Google Trends Data ===")
-all_data = select_subbrand(brand_name)  # Change "legion" to the desired sub-brand
-output_path = "D:/Python/Lenovo Google Trend/Raw file/"  + google_trend_name
+
+all_data = select_subbrand(brand_name)
+output_path = "D:/Python/Lenovo Google Trend/Raw_file/"  + Google_trend_name
 with pd.ExcelWriter(output_path) as writer:
     for country, df in all_data.items():
         # Nama sheet maksimal 31 karakter, amanin
         sheet_name = country[:31]
         df.to_excel(writer, sheet_name=sheet_name, index=False)
 
-print(f"📁 All data has been extracted and saved in {output_path}")
 
-"""print("\n=== Start Processing Data===")
-hasil = data_processing.process_trends_data(output_path, google_trend_name)
+print(f"📁 Semua data selesai disimpan di {output_path}")
+print("\n=== Memulai memproses data===")
+hasil = data_processing.process_trends_data(output_path, Google_trend_name)
 
 print("\nProcessing is complete! Here is preview of:\n")
-print(hasil.head(10))"""
+print(hasil.head(10))
