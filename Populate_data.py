@@ -3,10 +3,11 @@ from glob import glob
 import numpy as np
 import os
 
-sos_folder = "D:/Data work/Lenovo/Raw Data/04. Share of Search (new)/Computer Category"
+# Define the folder containing the Share of Search Excel Raw files
+share_of_search_folder = "D:/Python/Lenovo Google Trend - Copy/test_file"
 
 # Search for all Excel files in the specified folder and its subfolders
-excel_files = glob(os.path.join(sos_folder, "*", "*.xlsx"))
+excel_files = glob(os.path.join(share_of_search_folder, "*.xlsx"))
 
 # List to hold all DataFrames
 all_dataframes = []
@@ -15,8 +16,8 @@ all_dataframes = []
 for file in excel_files:
     try:
         df = pd.read_excel(file, engine="openpyxl")
-        df['source_file'] = os.path.basename(file)  # Add filename
-        df['source_folder'] = os.path.basename(os.path.dirname(file))  # Add folder name
+        df['source_file'] = os.path.basename(file) 
+        df['source_folder'] = os.path.basename(os.path.dirname(file)) 
         all_dataframes.append(df)
     except Exception as e:
         print(f"Error processing {file}: {e}")
@@ -31,7 +32,7 @@ else:
 print(combined_df.head(10))
 
 # Function to clean and process the Share of Search data
-def clean_share_of_search_data(t_df):
+def clean_share_of_search_data(sos_df):
     month_dict = {
         1: 'January',
         2: 'February',
@@ -46,24 +47,22 @@ def clean_share_of_search_data(t_df):
         11: 'November',
         12: 'December'
     }
-    t_df['Year'] = t_df['Week'].dt.year
-    t_df['Month.no'] = t_df['Week'].dt.month
-    t_df['Month Name'] = t_df['Month.no'].map(month_dict)
-    t_df['Quarter'] = 'Q' + t_df['Week'].dt.quarter.astype(str)
-    t_df['MMM'] = t_df['Month Name'].str[:3]
-    t_df['Quarter (SOS)'] = t_df['Quarter'] + ' FY' + t_df['Year'].astype(str)
+    sos_df['Year'] = sos_df['Week'].dt.year
+    sos_df['Month.no'] = sos_df['Week'].dt.month
+    sos_df['Month Name'] = sos_df['Month.no'].map(month_dict)
+    sos_df['Quarter'] = 'Q' + sos_df['Week'].dt.quarter.astype(str)
+    sos_df['MMM'] = sos_df['Month Name'].str[:3]
+    sos_df['Quarter (SOS)'] = sos_df['Quarter'] + ' FY' + sos_df['Year'].astype(str)
     search_rename = {
         'LENOVO IDEAPAD': 'IDEAPAD',
         'LENOVO LEGION': 'LEGION',
         'LENOVO YOGA': 'YOGA',
         'LENOVO LOQ': 'LOQ',
         'LENOVO TABLET': 'TABLET',
-        'LENOVO TAB': 'TAB',
-        'ACER INSPIRE': 'ACER ASPIRE',  # Correcting typo
-        'APLLE IPAD': 'APPLE IPAD'  # Correcting typo
+        'LENOVO TAB': 'TAB'
     }
 
-    t_df['Search term'] = t_df['Search term'].replace(search_rename)
+    sos_df['Search term'] = sos_df['Search term'].replace(search_rename)
 
     search_mapping = {
         'ACER ASPIRE': {'premium&gaming':np.nan, 'brand': 'ACER', 'lenovo&competitor': 'IDEAPAD'},
@@ -101,13 +100,13 @@ def clean_share_of_search_data(t_df):
         'YOGA': {'premium&gaming':'Premium', 'brand': 'LENOVO', 'lenovo&competitor': 'YOGA'}
     }
     # Map premium&gaming
-    t_df['Premium & Gaming'] = t_df['Search term'].map(lambda x: search_mapping.get(x, {}).get('premium&gaming'))
+    sos_df['Premium & Gaming'] = sos_df['Search term'].map(lambda x: search_mapping.get(x, {}).get('premium&gaming'))
 
     # Map brand
-    t_df['Brand'] = t_df['Search term'].map(lambda x: search_mapping.get(x, {}).get('brand'))
+    sos_df['Brand'] = sos_df['Search term'].map(lambda x: search_mapping.get(x, {}).get('brand'))
 
     # Map lenovo&competitor
-    t_df['Lenovo & Competitor'] = t_df['Search term'].map(lambda x: search_mapping.get(x, {}).get('lenovo&competitor'))
+    sos_df['Lenovo & Competitor'] = sos_df['Search term'].map(lambda x: search_mapping.get(x, {}).get('lenovo&competitor'))
 
     country_mapping = {
         'INDONESIA': 'Indonesia',
@@ -129,20 +128,20 @@ def clean_share_of_search_data(t_df):
 
 
     # Apply the mapping to standardize country names
-    t_df['Country'] = t_df['Country'].replace(country_mapping)
-    t_df['Week'] = t_df['Week'].dt.date
+    sos_df['Country'] = sos_df['Country'].replace(country_mapping)
+    sos_df['Week'] = sos_df['Week'].dt.date
 
-    t_df['Merge'] = t_df['Quarter (SOS)'] + ' ' + t_df['Country'] + ' ' + t_df['Search term']
-    t_df = t_df[['Week', 'Country', 'Region', 'Search term', 'Trend index', 'Brand',
+    sos_df['Merge'] = sos_df['Quarter (SOS)'] + ' ' + sos_df['Country'] + ' ' + sos_df['Search term']
+    sos_df = sos_df[['Week', 'Country', 'Region', 'Search term', 'Trend index', 'Brand',
         'Premium & Gaming', 'Year', 'Month Name', 'Month.no', 'Quarter', 'MMM',
         'Quarter (SOS)', 'Merge', 'Lenovo & Competitor']]
     
-    return t_df
+    return sos_df
 
-t_df = clean_share_of_search_data(combined_df)
+sos_df = clean_share_of_search_data(combined_df)
 
-print(f"Processed DataFrame has shape such as: {t_df.shape}")
-print(t_df.head(10))
+print(f"Processed DataFrame has shape such as: {sos_df.shape}")
+print(sos_df.head(10))
 
 # Save the cleaned DataFrame to a new Excel file
-#t_df.to_csv("sos_processed_yearly_world(9jun).csv", index=False)
+sos_df.to_csv("Google_Trends_2022_2025.csv", index=False)

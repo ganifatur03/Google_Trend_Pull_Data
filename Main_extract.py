@@ -13,7 +13,13 @@ client = RestClient(Login_email, Login_password)
 
 # Countries list
 countries = {
+    'ID': "Indonesia",
+    'MY': "Malaysia",
+    'KR': "South Korea",
     'JP': "Japan",
+    'IN': "India",
+    'AU': "Australia",
+    'NZ': "New Zealand",
     'WORLD': None       # ommit location countries to get worldwide data
 }
 
@@ -47,14 +53,14 @@ sub_brand_mapping = {
     "brand": "LENOVO"
 }
 
-# Range tanggal
+# Date range for Google Trends data
 date_from = "2022-01-01"
 date_to = "2025-05-31"
 
-# List to store all trend data
+# List to store all Google Trend result API data
 data_trend_list = []
 
-# Loop untuk setiap negara
+# Function to extract Google Trends data while also loop it through countries
 def extract_google_trends_data(keywords_group, countries_subset=None):
     selected_countries = countries_subset if countries_subset is not None else countries
 
@@ -112,7 +118,7 @@ def extract_google_trends_data(keywords_group, countries_subset=None):
                         continue
                 df['Day'] = df['Day'].dt.date  # Keep only the date part
 
-                # Convert to long format
+                # Convert Google Trend data to long format
                 data_trend = df.melt(
                     id_vars=['Day', 'Country', 'Region'],
                     var_name='Search term',
@@ -127,11 +133,12 @@ def extract_google_trends_data(keywords_group, countries_subset=None):
         else:
             print(f"API error for {country}: {response['status_message']}")
     
-    # Combine all trend data into a single DataFrame
+    # Combine all data from each countries into a single DataFrame
     final_result = pd.concat(data_trend_list, ignore_index=True)
     final_result.rename(columns={"Day": "Week"}, inplace=True)
     return final_result
 
+# Function to select which sub-brand to be extracted
 def select_subbrand(subbrand):
     if subbrand not in sub_brand_mapping:
         raise ValueError(
@@ -158,7 +165,7 @@ def select_subbrand(subbrand):
         # Combine all parts and drop duplicates
         final_extract = pd.concat(extract_parts, ignore_index=True)
         final_extract = final_extract.drop_duplicates(
-            subset=["Day", "Country", "Region", "Search term"],
+            subset=["Week", "Country", "Region", "Search term"],
             keep='first'
         )
 
@@ -169,24 +176,25 @@ def select_subbrand(subbrand):
 
     return final_extract
 
-print("=== Memulai Mengekstrak Data Google Trends ===")
+# Main execution starts here, also includes user input for sub-brand and logging purpose
+print("=== Begin extracting Google Trends data ===")
+
 brand_name = input("\nSelect which Lenovo sub brand you want to extract (example: 'legion', 'ideapad', etc): ").lower()
-Google_trend_name = input("Type file name for extracted google trends data (example: 'result_google_trends.xlsx'): ")
+Google_trend_name = input("Type the file name for extracted data (example: 'result_google_trends.xlsx'): ")
 if not Google_trend_name.endswith('.xlsx'):
         Google_trend_name = Google_trend_name + '.xlsx'
 
-
 all_data = select_subbrand(brand_name)
-output_path = "D:/Python/Lenovo Google Trend - Copy/Raw_file/"  + Google_trend_name
+output_path = "D:/Python/Lenovo Google Trend - Copy/test_file/"  + Google_trend_name
+
 print(all_data.head(10))
-print(f"Berikut adalah negara yang telah diekstrak: {all_data['Country'].unique()}")
-print(f"Berikut adalah region yang telah diekstrak: {all_data['Region'].unique()}")
-print(f"Berikut adalah search term yang telah diekstrak: {all_data['Search term'].unique()}")
+print(f"\nThis is Country name inside extracted data: {all_data['Country'].unique()}")
+print(f"This is Region name inside extracted data: {all_data['Region'].unique()}")
+print(f"This is Search term inside extracted data: {all_data['Search term'].unique()}")
 print(all_data.shape)
-print(type(all_data))
 
 # Save the combined data to an Excel file
 with pd.ExcelWriter(output_path) as writer:
     all_data.to_excel(writer, index=False)
 
-print(f"📁 Extraction process completed, data has been saved in: {output_path}")
+print(f"\n📁 Extraction process completed, data has been saved in: {output_path}")
