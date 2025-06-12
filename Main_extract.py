@@ -15,6 +15,12 @@ client = RestClient(Login_email, Login_password)
 countries = {
     'ID': "Indonesia",
     'MY': "Malaysia",
+    'SG': "Singapore",
+    'PH': "Philippines",
+    'VN': "Vietnam",
+    'TH': "Thailand",
+    'TW': "Taiwan",
+    'HK': "Hong Kong",
     'KR': "South Korea",
     'JP': "Japan",
     'IN': "India",
@@ -37,19 +43,18 @@ region_mapping = {
     "India": "IN",
     "Australia": "ANZ",
     "New Zealand": "ANZ",
-    "Worldwide": "WORLD"
+    "Worldwide": "WW"
 }
 
 
 # Dictionary of Keywords group for each brand
 sub_brand_mapping = {
     "yoga": [["LENOVO YOGA", "APPLE MACBOOK", "ASUS ZENBOOK", "DELL XPS", "HP ENVY"], 
-             ["LENOVO YOGA", "APPLE MACBOOK", "DELL INSPIRON", "ACER SWIFT", "HP SPECTRE"]],
+             ["LENOVO YOGA", "APPLE MACBOOK", "DELL INSPIRON 7000", "ACER SWIFT", "HP SPECTRE"]],
     "ideapad": ["LENOVO IDEAPAD", "HP PAVILION", "ASUS VIVOBOOK", "ACER ASPIRE", "DELL INSPIRON"] ,
     "loq": ["LENOVO LOQ", "ACER NITRO", "HP VICTUS", "MSI CYBORG", "ASUS TUF"],
     "legion": ["LENOVO LEGION", "ASUS ROG", "HP OMEN", "ACER PREDATOR", "MSI GAMING"],
-    "tablet": [["LENOVO TAB", "LENOVO TABLET", "SAMSUNG GALAXY TAB", "XIAOMI PAD", "HUAWEI MATEPAD"], 
-               ["LENOVO TAB", "LENOVO TABLET", "SAMSUNG GALAXY TAB","REALME PAD", "APPLE IPAD"]],
+    "handheld": ["LEGION GO", "MSI CLAW", "ROG ALLY", "STEAM DECK"],
     "brand": "LENOVO"
 }
 
@@ -71,8 +76,8 @@ def extract_google_trends_data(keywords_group, countries_subset=None):
                 "date_from": date_from,
                 "date_to": date_to,
                 "type": "web",
-                "keywords": keywords_group,
-                "category_name": "Computers & Electronics"
+                "keywords": keywords_group
+                #"category_name": "Computers & Electronics"
             }
         }
 
@@ -87,7 +92,7 @@ def extract_google_trends_data(keywords_group, countries_subset=None):
                 for entry in trend_data:
                     date_str = datetime.strptime(entry["date_from"], "%Y-%m-%d").strftime("%d/%m/%Y")
                     values = [v if v is not None else 0 for v in entry["values"]]
-                    row = {"Day": date_str}
+                    row = {"Week": date_str}
                     for i, kw in enumerate(keywords_group):
                         row[f"{kw}: ({country})"] = values[i]
                     rows.append(row)
@@ -97,7 +102,7 @@ def extract_google_trends_data(keywords_group, countries_subset=None):
                 # Add Country and Region columns
                 if country is None:
                     df['Country'] = "Worldwide"
-                    df['Region'] = "WORLD"
+                    df['Region'] = "WW"
                 else:
                     region = region_mapping.get(country, "Unknown")
                     df['Country'] = country
@@ -107,20 +112,20 @@ def extract_google_trends_data(keywords_group, countries_subset=None):
                 # Clean column names by removing ": (country)"
                 df.columns = df.columns.str.replace(r":\s*\(.+?\)", "", regex=True)
 
-                # Parse Day column
+                # Parse Week column
                 try:
-                    df['Day'] = pd.to_datetime(df['Day'], format='%d/%m/%Y')
+                    df['Week'] = pd.to_datetime(df['Week'], format='%d/%m/%Y')
                 except:
                     try:
-                        df['Day'] = pd.to_datetime(df['Day'])
+                        df['Week'] = pd.to_datetime(df['Week'])
                     except:
                         print(f"Date parsing issue for {country}. Please check the date format.")
                         continue
-                df['Day'] = df['Day'].dt.date  # Keep only the date part
+                df['Week'] = df['Week'].dt.date  # Keep only the date part
 
                 # Convert Google Trend data to long format
                 data_trend = df.melt(
-                    id_vars=['Day', 'Country', 'Region'],
+                    id_vars=['Week', 'Country', 'Region'],
                     var_name='Search term',
                     value_name='Trend index'
                 )
@@ -135,7 +140,6 @@ def extract_google_trends_data(keywords_group, countries_subset=None):
     
     # Combine all data from each countries into a single DataFrame
     final_result = pd.concat(data_trend_list, ignore_index=True)
-    final_result.rename(columns={"Day": "Week"}, inplace=True)
     return final_result
 
 # Function to select which sub-brand to be extracted

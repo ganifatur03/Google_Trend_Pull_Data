@@ -4,7 +4,7 @@ import numpy as np
 import os
 
 # Define the folder containing the Share of Search Excel Raw files
-share_of_search_folder = "D:/Python/Lenovo Google Trend - Copy/test_file"
+share_of_search_folder = "D:/Data work/Lenovo/Raw Data/04. Share of Search (new)/Computer Category"
 
 # Search for all Excel files in the specified folder and its subfolders
 excel_files = glob(os.path.join(share_of_search_folder, "*.xlsx"))
@@ -29,7 +29,10 @@ if all_dataframes:
 else:
     print("No data was loaded. Check the path and file patterns.")
 
-print(combined_df.head(10))
+# Drop 2021 data
+combined_df = combined_df[combined_df['Week'].dt.year != 2021]
+
+#print(combined_df.head(10))
 
 # Function to clean and process the Share of Search data
 def clean_share_of_search_data(sos_df):
@@ -97,7 +100,11 @@ def clean_share_of_search_data(sos_df):
         'TAB': {'premium&gaming':np.nan, 'brand': 'LENOVO', 'lenovo&competitor': 'TAB/TABLET'},
         'TABLET': {'premium&gaming':np.nan, 'brand': 'LENOVO', 'lenovo&competitor': 'TAB/TABLET'},
         'XIAOMI PAD': {'premium&gaming':np.nan, 'brand': 'XIAOMI', 'lenovo&competitor': 'TAB/TABLET'},
-        'YOGA': {'premium&gaming':'Premium', 'brand': 'LENOVO', 'lenovo&competitor': 'YOGA'}
+        'YOGA': {'premium&gaming':'Premium', 'brand': 'LENOVO', 'lenovo&competitor': 'YOGA'},
+        'LEGION GO': {'premium&gaming':'Handheld Gaming', 'brand': 'LENOVO', 'lenovo&competitor': 'LEGION GO'},
+        'MSI CLAW': {'premium&gaming':'Handheld Gaming', 'brand': 'MSI', 'lenovo&competitor': 'LEGION GO'},
+        'ROG ALLY': {'premium&gaming':'Handheld Gaming', 'brand': 'ASUS', 'lenovo&competitor': 'LEGION GO'},
+        'STEAM DECK': {'premium&gaming':'Handheld Gaming', 'brand': 'VALVE', 'lenovo&competitor': 'LEGION GO'}
     }
     # Map premium&gaming
     sos_df['Premium & Gaming'] = sos_df['Search term'].map(lambda x: search_mapping.get(x, {}).get('premium&gaming'))
@@ -144,4 +151,8 @@ print(f"Processed DataFrame has shape such as: {sos_df.shape}")
 print(sos_df.head(10))
 
 # Save the cleaned DataFrame to a new Excel file
-sos_df.to_csv("Google_Trends_2022_2025.csv", index=False)
+output_path = "D:/Python/Lenovo Google Trend - Copy/test_file/Google Trends - Computer.xlsx"
+with pd.ExcelWriter(output_path) as writer:
+    sos_df.to_excel(writer, index=False)
+
+print(f"\n📁 Extraction process completed, data has been saved in: {output_path}")
