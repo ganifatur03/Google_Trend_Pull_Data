@@ -15,7 +15,7 @@ sub_brand_mapping = {
     "LOQ": ["LOQ", "ACER NITRO", "HP VICTUS", "MSI CYBORG", "ASUS TUF"],
     "LEGION": ["LEGION", "ASUS ROG", "HP OMEN", "ACER PREDATOR", "MSI GAMING"],
     "LEGION GO": ["LEGION GO", "MSI CLAW", "ROG ALLY", "STEAM DECK"],
-    "LENOVO": "LENOVO"
+    "LENOVO": ["LENOVO"]
 }
 
 category_mapping = {
@@ -51,6 +51,25 @@ def check_data_quality(df, required_cols):
     print("\n----) Checking 'Search term' values:")
     print(df['Search term'].value_counts())
 
+    # 4. Check Week column date range
+    print("\n----) Checking 'Week' date range:")
+    try:
+        df['Week'] = pd.to_datetime(df['Week'], errors='coerce')
+        min_date = df['Week'].min()
+        max_date = df['Week'].max()
+
+        print(f"🗓️ Date range: {min_date.strftime('%b-%Y')} to {max_date.strftime('%b-%Y')}")
+
+        # Validate if all dates are within 2022-2025
+        invalid_dates = df[~df['Week'].dt.year.between(2022, 2025)]
+        if not invalid_dates.empty:
+            print(f"⚠️ Found {len(invalid_dates)} rows outside the 2022–2025 range.")
+        else:
+            print("✅ All dates fall within 2022–2025 range.")
+
+    except Exception as e:
+        print("❌ Error while processing 'Week' column:", e)
+
     print("\n✅ Data quality check complete.")
 
 def validate_search_term_competitor(df, mapping, search_col="Search term", competitor_col="Lenovo & Competitor", allowed_blank_terms=None):
@@ -84,9 +103,9 @@ def validate_search_term_competitor(df, mapping, search_col="Search term", compe
     if invalid_rows:
         print("⚠️ Found mismatched rows:")
         for row in invalid_rows:
-            print(f"Row {row[0]}: {search_col} '{row[1]}' was recorded as '{row[2]}'. It supposed to be classified as '{row[3]}'")
+            print(f"Row {row[0]}: {search_col} '{row[1]}' was recorded as '{row[2]}' in {competitor_col}. It supposed to be classified as '{row[3]}'")
     else:
-        print("✅ All search term-competitor pairs are valid.")
+        print(f"✅ All data for {search_col} - {competitor_col} column pairs are valid.")
 
 
 def validate_country_region(df, expected_mapping):
