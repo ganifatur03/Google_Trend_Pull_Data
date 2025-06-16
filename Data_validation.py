@@ -47,25 +47,43 @@ def check_data_quality(df, required_cols):
     print("Unique Countries:", df['Country'].dropna().unique())
     print("Unique Regions :", df['Region'].dropna().unique())
 
-    # 3. Check unique value and validate column for Search term
+    # 3a. Check unique value and validate column for Search term
     print("\n----) Checking 'Search term' values:")
     print(df['Search term'].value_counts())
+
+    # 3b. Check unique value and validate column for Search term
+    print("\n----) Checking 'Search term' values:")
+    print(df['Country'].value_counts())
+
 
     # 4. Check Week column date range
     print("\n----) Checking 'Week' date range:")
     try:
         df['Week'] = pd.to_datetime(df['Week'], errors='coerce')
-        min_date = df['Week'].min()
-        max_date = df['Week'].max()
+        overall_min = df['Week'].min()
+        overall_max = df['Week'].max()
+        print(f"📆 Date Range: {overall_min.strftime('%b-%Y')} to {overall_max.strftime('%b-%Y')}")
 
-        print(f"🗓️ Date range: {min_date.strftime('%b-%Y')} to {max_date.strftime('%b-%Y')}")
+        # Expected full range
+        expected_start = df['Week'].min()
+        expected_end = df['Week'].max()
 
-        # Validate if all dates are within 2022-2025
-        invalid_dates = df[~df['Week'].dt.year.between(2022, 2025)]
-        if not invalid_dates.empty:
-            print(f"⚠️ Found {len(invalid_dates)} rows outside the 2022–2025 range.")
-        else:
-            print("✅ All dates fall within 2022–2025 range.")
+
+        # Group by Country + Competitor
+        grouped = df.groupby(['Country', 'Lenovo & Competitor'])
+
+        print("\n🔍 Incomplete date ranges per Country + Competitor:")
+
+        found_incomplete = False
+        for (country, competitor), group in grouped:
+            min_date = group['Week'].min()
+            max_date = group['Week'].max()
+            if min_date > expected_start or max_date < expected_end:
+                found_incomplete = True
+                print(f"⚠️ {country} - {competitor} → {min_date.strftime('%b-%Y')} to {max_date.strftime('%b-%Y')}")
+        
+        if not found_incomplete:
+            print("✅ All Country + Competitor combinations have full date coverage.")
 
     except Exception as e:
         print("❌ Error while processing 'Week' column:", e)
@@ -176,7 +194,7 @@ def main():
         if file_path.endswith(".csv"):
             df = pd.read_csv(file_path)
         else:
-            df = pd.read_excel(file_path)
+            df = pd.read_excel(file_path, sheet_name='Sheet2')
     except Exception as e:
         print(f"❌ Failed to load file: {e}")
         return
