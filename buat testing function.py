@@ -1,9 +1,12 @@
-from client import RestClient
 import pandas as pd
 
-data = pd.read_excel("D:/Python/Lenovo Google Trend - Copy/test_file/loq-youtube-com.xlsx", engine='openpyxl')
+# Define the folder containing the Share of Search Excel Raw files
+folder_available = ["computer", "youtube"]
+select_folder = input("Please input the folder path: (Chose Computer / Youtube )\n").lower()
 
-# Drop data 2021
-data = data[data['Week'].dt.year != 2021]
+if select_folder not in folder_available:
+    raise ValueError(f"Invalid folder selected. Please choose from: {folder_available}")
 
-print(data.head(10))
+path = "D:/Data work/Lenovo/Raw Data/04. Share of Search (new)/"
+share_of_search_folder = path + select_folder + " data"
+print(f"Selected folder: {share_of_search_folder}")

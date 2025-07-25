@@ -194,7 +194,7 @@ def main():
         if file_path.endswith(".csv"):
             df = pd.read_csv(file_path)
         else:
-            df = pd.read_excel(file_path, sheet_name='Sheet2')
+            df = pd.read_excel(file_path)
     except Exception as e:
         print(f"❌ Failed to load file: {e}")
         return

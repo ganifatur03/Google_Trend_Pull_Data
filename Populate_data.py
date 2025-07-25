@@ -4,7 +4,14 @@ import numpy as np
 import os
 
 # Define the folder containing the Share of Search Excel Raw files
-share_of_search_folder = "D:/Data work/Lenovo/Raw Data/04. Share of Search (new)/Computer Category"
+folder_available = ["computer", "youtube"]
+select_folder = input("Please input the folder path: (Chose Computer / Youtube )\n").lower()
+
+if select_folder not in folder_available:
+    raise ValueError(f"Invalid folder selected. Please choose from: {folder_available}")
+
+path = "D:/Data work/Lenovo/Raw Data/04. Share of Search (new)/"
+share_of_search_folder = path + select_folder + " data"
 
 # Search for all Excel files in the specified folder and its subfolders
 excel_files = glob(os.path.join(share_of_search_folder, "*.xlsx"))
@@ -72,6 +79,7 @@ def clean_share_of_search_data(sos_df):
         'ACER NITRO': {'premium&gaming':'Mainstream Gaming', 'brand': 'ACER', 'lenovo&competitor': 'LOQ'},
         'ACER PREDATOR': {'premium&gaming':'Gaming', 'brand': 'ACER', 'lenovo&competitor': 'LEGION'},
         'ACER SWIFT': {'premium&gaming':'Premium', 'brand': 'ACER', 'lenovo&competitor': 'YOGA'},
+        'ACER SPIN': {'premium&gaming':'Premium', 'brand': 'ACER', 'lenovo&competitor': 'YOGA'},
         'APPLE IPAD': {'premium&gaming':np.nan, 'brand': 'APPLE', 'lenovo&competitor': 'TAB/TABLET'},
         'APPLE MACBOOK': {'premium&gaming':'Premium', 'brand': 'APPLE', 'lenovo&competitor': 'YOGA'},
         'ASUS ROG': {'premium&gaming':'Gaming', 'brand': 'ASUS', 'lenovo&competitor': 'LEGION'},
@@ -151,7 +159,8 @@ print(f"Processed DataFrame has shape such as: {sos_df.shape}")
 print(sos_df.head(10))
 
 # Save the cleaned DataFrame to a new Excel file
-output_path = "D:/Python/Lenovo Google Trend - Copy/test_file/Google Trends - Computer.xlsx"
+out_path = "D:/Python/Lenovo Google Trend - Copy/test_file/Google Trends - "
+output_path = out_path + select_folder + "_data.xlsx"
 with pd.ExcelWriter(output_path) as writer:
     sos_df.to_excel(writer, index=False)
 

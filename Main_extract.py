@@ -26,7 +26,7 @@ countries = {
     'IN': "India",
     'AU': "Australia",
     'NZ': "New Zealand",
-    'WORLD': None       # ommit location countries to get worldwide data
+    'WORLD': None  # Worldwide
 }
 
 region_mapping = {
@@ -55,12 +55,15 @@ sub_brand_mapping = {
     "loq": ["LENOVO LOQ", "ACER NITRO", "HP VICTUS", "MSI CYBORG", "ASUS TUF"],
     "legion": ["LENOVO LEGION", "ASUS ROG", "HP OMEN", "ACER PREDATOR", "MSI GAMING"],
     "handheld": ["LEGION GO", "MSI CLAW", "ROG ALLY", "STEAM DECK"],
-    "brand": "LENOVO"
+    "brand": ["LENOVO"],
+    "yoga_testing1": ["LENOVO YOGA", "APPLE MACBOOK", "ACER SPIN"],
+    "yoga_testing2": ["LENOVO YOGA", "ACER SPIN", "DELL INSPIRON 7000", "ACER SWIFT", "HP SPECTRE"],
+    "keyword_test" : ["LENOVO YOGA", "Dell Plus", "Dell Premium", "HP OmniBook Ultra", "HP OmniBook X"]
 }
 
 # Date range for Google Trends data
 date_from = "2022-01-01"
-date_to = "2025-05-31"
+date_to = "2025-06-30"
 
 # List to store all Google Trend result API data
 data_trend_list = []
@@ -75,9 +78,9 @@ def extract_google_trends_data(keywords_group, countries_subset=None):
                 "location_name": country,
                 "date_from": date_from,
                 "date_to": date_to,
-                "type": "web",
-                "keywords": keywords_group
-                #"category_name": "Computers & Electronics"
+                "type": "youtube",
+                "keywords": keywords_group,
+                "category_name": "Computers & Electronics"
             }
         }
 
